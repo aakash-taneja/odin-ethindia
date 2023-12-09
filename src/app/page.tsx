@@ -1,95 +1,110 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import { SafeAuthPack, AuthKitSignInData } from "@safe-global/auth-kit";
+import DashBoard from "./dashboard/page";
 
-export default function Home() {
+const LoginPage: React.FC = () => {
+  const [safeAuthPack, setSafeAuthPack] = useState<any>(null);
+  const [authData, setAuthData] = useState<AuthKitSignInData | null>(null);
+
+  useEffect(() => {
+    // Initialize SafeAuthPack on component mount
+    const initializeSafeAuth = async () => {
+      try {
+        // Create SafeAuthPack instance
+        const safeAuthPackInstance = new SafeAuthPack();
+        const chainConfig = {
+          chainId: "0x13881", // Change this to the desired chainId
+          rpcTarget: "https://polygon-mumbai-bor.publicnode.com", // Change this to the RPC endpoint of the desired network
+        };
+        await safeAuthPackInstance.init({ enableLogging: true, chainConfig });
+
+        // Set the SafeAuthPack instance in the state
+        setSafeAuthPack(safeAuthPackInstance);
+      } catch (error) {
+        console.error("Error initializing SafeAuthPack:", error);
+      }
+    };
+
+    initializeSafeAuth();
+  }, []);
+
+  const handleSignIn = async () => {
+    try {
+      if (safeAuthPack) {
+        // Call signIn method to initiate the authentication process
+        const authData = await safeAuthPack.signIn();
+        setAuthData(authData);
+      }
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      if (safeAuthPack) {
+        // Call signOut method to end the current session
+        await safeAuthPack.signOut();
+        setAuthData(null);
+      }
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  console.log(authData);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        flexDirection: "column",
+      }}
+    >
+      {/* {authData ? (
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <p>Signed in with EOA: {authData.eoa}</p>
+          {authData.safes && (
+            <p>Associated Safe addresses: {authData.safes.join(", ")}</p>
+          )}
+          <button
+            style={{ padding: "10px", borderRadius: "10px" }}
+            onClick={handleSignOut}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            Sign Out
+          </button>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+      ) : (
+        <button
+          style={{ padding: "10px", borderRadius: "10px", cursor: "pointer" }}
+          onClick={handleSignIn}
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          Sign In
+        </button>
+      )} */}
+      {authData ? (
+        <>
+          <DashBoard authData={authData} safeAuthPack={safeAuthPack} />
+          <button
+            style={{ padding: "10px", borderRadius: "10px" }}
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </button>
+        </>
+      ) : (
+        <>
+          <h1 style={{ marginBottom: "20px" }}>Login Page</h1>
+          <button onClick={handleSignIn}>Sign In</button>
+        </>
+      )}
+    </div>
+  );
+};
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default LoginPage;

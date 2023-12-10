@@ -1,6 +1,6 @@
 "use client";
 import { deploytoLightHouse } from "@/lightHouseStorage";
-import { uploadToBackend } from "@/services/metaServices";
+import { saveToDb, uploadToBackend } from "@/services/metaServices";
 import { ethers } from "ethers";
 import React, { useState } from "react";
 import abi from "@/abi.json";
@@ -78,7 +78,7 @@ const DashBoard: React.FC<{ authData: any; safeAuthPack: any }> = ({
         const signer = await provider.getSigner();
         console.log("signer", signer);
         // Create the contract instance
-        const contractAddress = "0xaFc9dE72D13eE5dBCb586420Aa8014f7eDE99886";
+        const contractAddress = "0x6641126700308379cDb602B4e8Dc1afC13D6c088";
         const contractABI = abi;
         const contract = new ethers.Contract(
           contractAddress,
@@ -99,6 +99,9 @@ const DashBoard: React.FC<{ authData: any; safeAuthPack: any }> = ({
         console.error("Error calling contract:", error);
       }
     }
+
+    const save = await saveToDb(mcid);
+    console.log("save", save);
 
     // Reset the form after submission
     setFormData({
@@ -139,8 +142,15 @@ const DashBoard: React.FC<{ authData: any; safeAuthPack: any }> = ({
             onChange={handleDescriptionChange}
           />
         </div>
-        <div>
-          <button type="submit">Submit</button>
+        <div
+          style={{ display: "flex", justifyContent: "center", width: "100%" }}
+        >
+          <button
+            type="submit"
+            style={{ padding: "10px", borderRadius: "10px" }}
+          >
+            Submit
+          </button>
         </div>
       </form>
     </div>

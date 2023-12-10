@@ -66,27 +66,6 @@ const LoginPage: React.FC = () => {
         flexDirection: "column",
       }}
     >
-      {/* {authData ? (
-        <div>
-          <p>Signed in with EOA: {authData.eoa}</p>
-          {authData.safes && (
-            <p>Associated Safe addresses: {authData.safes.join(", ")}</p>
-          )}
-          <button
-            style={{ padding: "10px", borderRadius: "10px" }}
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-        </div>
-      ) : (
-        <button
-          style={{ padding: "10px", borderRadius: "10px", cursor: "pointer" }}
-          onClick={handleSignIn}
-        >
-          Sign In
-        </button>
-      )} */}
       {authData ? (
         <>
           <DashBoard authData={authData} safeAuthPack={safeAuthPack} />
